@@ -1,0 +1,14 @@
+{
+    "alice": {
+        "phone": "1234567890",
+        "relationship": "close friend",
+        "interests": "crypto, chainlink and web3, cooking with fine ingredients",
+        "note": "Orion, her coworker, is giving her a lot of trouble"
+    },
+    "bob": {
+        "phone": "1987654321",
+        "relationship": "co-worker",
+        "interests": "coding, communication, caring about others",
+        "note": "Recent death in the family"
+    }
+}
