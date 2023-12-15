@@ -46,7 +46,7 @@ Follow these simple steps to set up and run Awesome Friend:
    ```bash
    npm install
    ```
-3. Navigate to the .env file in the project directory and add your OpenAI API key:
+3. Create an .env file in the project directory and add your OpenAI API key:
     ```bash
     OPENAI_API=your-openai-api-key
     ```
