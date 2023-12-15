@@ -7,7 +7,7 @@ Awesome Friend is a Node.js program that generates and sends personalized good m
 
 ## Prerequisites
 
-:information_source: Before you can use Awesome Friend, make sure you have the following prerequisites:
+ℹ️ Before you can use Awesome Friend, make sure you have the following prerequisites:
 
 1. A Mac computer with macOS installed.
 2. An iPhone connected to your Mac.
