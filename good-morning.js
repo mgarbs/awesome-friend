@@ -35,10 +35,11 @@ async function sendTextMessage(to, body) {
 }
 
 const execAsync = promisify(exec);
+const dayOfWeek = new Date().toLocaleDateString('en-US', { weekday: 'long' });
 
 // Function to generate messages
 async function generateMessages(contacts) {
-    let prompt = "Create a very short, personalized good morning message without any numbers in it. Each message should be no longer than two sentences and have a tone of gratitude and surrender toward God for the following contacts:\n";
+    let prompt = `Create a very short, personalized good morning message without any numbers in it. Mention that it's ${dayOfWeek}. Do not start the text with "To my x:" No colon just sentences. Each message should be no longer than two sentences and have a tone of gratitude and surrender toward God filled with notes of positiity for the day for the following contacts:\n`;
 
     for (const [name, info] of Object.entries(contacts)) {
         prompt += `- For my ${info.relationship} who likes ${info.interests}, though not necessarily a daily activity. (${info.note ? 'Note: ' + info.note : 'No specific note'})\n`;
