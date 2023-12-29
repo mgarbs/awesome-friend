@@ -38,7 +38,11 @@ async function sendTextMessage(to, body) {
 
 // Function to generate messages for a chunk of contacts
 async function generateMessagesForChunk(contactsChunk) {
-    let prompt = `Create a very short, personalized good morning message without any numbers in it. Mention that it's ${dayOfWeek}. Do not start the text with "To my x:" No colon just sentences. Each message should be no longer than two sentences and have a tone of gratitude and surrender toward God filled with notes of positivity for the day for the following contacts:\n`;
+    let prompt = `Create a short, personalized good morning message without any numbers in it. 
+    Mention that it's ${dayOfWeek}. Do not start the text with "To my x:" No colon just sentences. 
+    Each message should be no longer than three sentences having a tone of gratitude and 
+    surrender toward God but there's no need to mention God and each message should be filled 
+    with notes of positivity for the day for the following contacts:\n`;
 
     for (const [name, info] of Object.entries(contactsChunk)) {
         prompt += `- For my ${info.relationship} who likes ${info.interests}, though not necessarily a daily activity. (${info.note ? 'Note: ' + info.note : 'No specific note'})\n`;
@@ -47,7 +51,7 @@ async function generateMessagesForChunk(contactsChunk) {
     const response = await openai.chat.completions.create({
         model: 'gpt-4-1106-preview',
         messages: [{ role: 'user', content: prompt }],
-        max_tokens: 60 * Object.keys(contactsChunk).length
+        max_tokens: 70 * Object.keys(contactsChunk).length
     });
 
     const generatedMessages = response.choices[0].message.content.trim().split('\n').filter(line => line.trim());
