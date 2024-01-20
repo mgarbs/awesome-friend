@@ -38,32 +38,44 @@ async function sendTextMessage(to, body) {
 
 // Function to generate messages for a chunk of contacts
 async function generateMessagesForChunk(contactsChunk) {
-    let prompt = `Create a short, personalized good morning message without any numbers in it. 
-    Mention that it's ${dayOfWeek}. Do not start the text with "To my x:" No colon just sentences. 
-    Each message should be no longer than three sentences having a tone of gratitude and 
-    surrender toward God but there's no need to mention God and each message should be filled 
-    with notes of positivity for the day for the following contacts:\n`;
+    let prompt = `Create a personalized good morning message in the tone of the late Terry Davis 
+    for each person that reflects on a spiritual fruit but don't be too profound or corny just keep 
+    it simple. Mention that it is ${dayOfWeek}. Each message should be in a new paragraph with the format 
+    "To [Name]: [Message]".\n`;
 
     for (const [name, info] of Object.entries(contactsChunk)) {
-        prompt += `- For my ${info.relationship} who likes ${info.interests}, though not necessarily a daily activity. (${info.note ? 'Note: ' + info.note : 'No specific note'})\n`;
+        prompt += `To ${name}, my ${info.relationship}, who enjoys ${info.interests}. 
+        ${info.note ? 'Note: ' + info.note : 'No specific note'}.\n`;
     }
 
-    const response = await openai.chat.completions.create({
-        model: 'gpt-4-1106-preview',
-        messages: [{ role: 'user', content: prompt }],
-        max_tokens: 70 * Object.keys(contactsChunk).length
-    });
+    try {
+        const response = await openai.chat.completions.create({
+            model: 'gpt-4-1106-preview',
+            messages: [{ role: 'user', content: prompt }],
+            max_tokens: 70 * Object.keys(contactsChunk).length
+        });
 
-    const generatedMessages = response.choices[0].message.content.trim().split('\n').filter(line => line.trim());
-    let messages = {};
+        const generatedMessages = response.choices[0].message.content
+                                    .trim().split('\n')
+                                    .filter(line => line.startsWith('To '));
+        let messages = {};
 
-    Object.keys(contactsChunk).forEach((name, index) => {
-        if (index < generatedMessages.length) {
-            messages[name] = generatedMessages[index].replace(/- /g, '');
-        }
-    });
+        generatedMessages.forEach(message => {
+            const match = message.match(/^To (\w+): (.*)$/);
+            if (match && match.length === 3) {
+                const name = match[1];
+                const msg = match[2];
+                if (name in contactsChunk) {
+                    messages[name] = msg;
+                }
+            }
+        });
 
-    return messages;
+        return messages;
+    } catch (error) {
+        console.error(`Error generating messages for chunk: ${error}`);
+        throw error;
+    }
 }
 
 // Function to process contacts in chunks
