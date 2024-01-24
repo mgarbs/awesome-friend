@@ -58,15 +58,16 @@ async function generateMessagesForChunk(contactsChunk) {
         const generatedMessages = response.choices[0].message.content
                                     .trim().split('\n')
                                     .filter(line => line.startsWith('To '));
-        let messages = {};
+        const messages = {};
 
         generatedMessages.forEach(message => {
-            const match = message.match(/^To (\w+): (.*)$/);
+            const match = message.match(/^To (.*?):\s*(.*)$/);
             if (match && match.length === 3) {
-                const name = match[1];
-                const msg = match[2];
-                if (name in contactsChunk) {
-                    messages[name] = msg;
+                const name = match[1].trim();
+                const msg = match[2].trim();
+                const contactName = Object.keys(contactsChunk).find(contact => contact.toLowerCase() === name.toLowerCase());
+                if (contactName) {
+                    messages[contactName] = msg;
                 }
             }
         });
@@ -78,13 +79,19 @@ async function generateMessagesForChunk(contactsChunk) {
     }
 }
 
-// Function to process contacts in chunks
 async function processContactsInChunks(contacts) {
     const chunkSize = 20;
     let messages = {};
 
-    for (let i = 0; i < Object.keys(contacts).length; i += chunkSize) {
-        const chunk = Object.fromEntries(Object.entries(contacts).slice(i, i + chunkSize));
+    const totalChunks = Math.ceil(Object.keys(contacts).length / chunkSize);
+
+    for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
+        const startIndex = chunkIndex * chunkSize;
+        const endIndex = startIndex + chunkSize;
+        const chunk = Object.fromEntries(
+            Object.entries(contacts).slice(startIndex, endIndex)
+        );
+
         const chunkMessages = await generateMessagesForChunk(chunk);
         messages = { ...messages, ...chunkMessages };
     }
@@ -92,12 +99,11 @@ async function processContactsInChunks(contacts) {
     return messages;
 }
 
-// Main function
 async function main() {
     const messages = await processContactsInChunks(contacts);
 
     for (let [name, message] of Object.entries(messages)) {
-        await sendTextMessage(contacts[name].phone, message);
+        //await sendTextMessage(contacts[name].phone, message);
         console.log(`Message sent to ${name}: ${message}`);
     }
 }
